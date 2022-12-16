@@ -1,7 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
-import {View, TextInput, Button, Text} from 'react-native';
+import {View, Button, Text, StyleSheet} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import FormInput from '../components/FormInput';
+import FormButton from '../components/FormButton';
 
 const SignUpForm = () => {
   const [email, setEmail] = useState('');
@@ -52,36 +54,37 @@ const SignUpForm = () => {
   return (
     <View>
       {!user ? (
-        <>
-          <TextInput
+        <View style={styles.container}>
+          <FormInput
             placeholder="Email"
             value={email}
             onChangeText={setEmail}
           />
-          <TextInput
+          <FormInput
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
           />
-          <Button title="Sign Up" onPress={() => createUser()} />
-        </>
+          <FormButton buttonTitle="Sign Up" onPress={() => createUser()} />
+        </View>
       ) : (
         <>
           <Text>Welcome, {user.email}</Text>
           <Button title="Log Out" onPress={() => LogOut()} />
         </>
       )}
-      {/* <TextInput placeholder="Email" value={email} onChangeText={setEmail} />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <Button title="Sign Up" onPress={() => createUser()} />
-      <Button title="Log Out" onPress={() => LogOut()} /> */}
     </View>
   );
 };
 export default SignUpForm;
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // padding: 20,
+    // paddingTop: 50,
+  },
+});
