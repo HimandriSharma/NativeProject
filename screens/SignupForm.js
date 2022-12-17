@@ -1,9 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
-import {View, Button, Text, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
+import AppScreen from './AppScreen';
+import PushNotification from 'react-native-push-notification';
 
 const SignUpForm = () => {
   const [email, setEmail] = useState('');
@@ -12,14 +14,21 @@ const SignUpForm = () => {
   const [user, setUser] = useState();
 
   // Handle user state changes
+  // eslint-disable-next-line no-shadow
   function onAuthStateChanged(user) {
     setUser(user);
     if (initializing) {
       setInitializing(false);
     }
   }
-
+  const createChannels = () => {
+    PushNotification.createChannel({
+      channelId: 'red-button-channel',
+      channelName: 'Red Button Channel',
+    });
+  };
   useEffect(() => {
+    createChannels();
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
   }, []);
@@ -52,7 +61,7 @@ const SignUpForm = () => {
       .then(() => console.log('User signed out!'));
   };
   return (
-    <View>
+    <>
       {!user ? (
         <View style={styles.container}>
           <FormInput
@@ -69,12 +78,10 @@ const SignUpForm = () => {
           <FormButton buttonTitle="Sign Up" onPress={() => createUser()} />
         </View>
       ) : (
-        <>
-          <Text>Welcome, {user.email}</Text>
-          <Button title="Log Out" onPress={() => LogOut()} />
-        </>
+        <AppScreen />
+        // <FormButton buttonTitle="Sign Up" onPress={() => LogOut()} />
       )}
-    </View>
+    </>
   );
 };
 export default SignUpForm;
@@ -84,7 +91,5 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    // padding: 20,
-    // paddingTop: 50,
   },
 });
