@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, Platform} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
 import AppScreen from './AppScreen';
 import PushNotification from 'react-native-push-notification';
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
 
 const SignUpForm = () => {
   const [email, setEmail] = useState('');
@@ -27,10 +28,35 @@ const SignUpForm = () => {
       channelName: 'Red Button Channel',
     });
   };
+  const onRemoteNotification = notification => {
+    const isClicked = notification.getData().userInteraction === 1;
+
+    if (isClicked) {
+      console.log(isClicked);
+      // Navigate user to another screen
+    } else {
+      console.log('not clicked');
+      // Do something else with push notification
+    }
+    // Use the appropriate result based on what you needed to do for this notification
+    const result = PushNotificationIOS.FetchResult.NoData;
+    notification.finish(result);
+  };
   useEffect(() => {
-    createChannels();
+    const type = 'notification';
+    if (Platform === 'ios') {
+      PushNotificationIOS.addEventListener(type, onRemoteNotification);
+    } else {
+      createChannels();
+    }
+
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
+    return () => {
+      subscriber;
+      if (Platform === 'ios') {
+        PushNotificationIOS.removeEventListener(type);
+      }
+    }; // unsubscribe on unmount
   }, []);
 
   if (initializing) {

@@ -1,16 +1,24 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Platform} from 'react-native';
 import PushNotification from 'react-native-push-notification';
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
 
 const BigRedButton = () => {
   const sendNotification = () => {
-    console.log('red button clicked!');
-    PushNotification.localNotification({
-      channelId: 'red-button-channel',
-      title: 'Clicked Red Button',
-      message:
-        'You are receiving this notification because you click the big red button in your app.',
-    });
+    if (Platform !== 'ios') {
+      PushNotification.localNotification({
+        channelId: 'red-button-channel',
+        title: 'Clicked Red Button',
+        message:
+          'You are receiving this notification because you click the big red button in your app.',
+      });
+    } else {
+      PushNotificationIOS.addNotificationRequest({
+        alertTitle: 'Clicked Red Button',
+        alertBody:
+          'You are receiving this notification because you click the big red button in your app.',
+      });
+    }
   };
 
   return (
